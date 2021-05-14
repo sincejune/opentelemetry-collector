@@ -7,7 +7,7 @@ require (
 	github.com/Shopify/sarama v1.28.0
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/antonmedv/expr v1.8.9
-	github.com/apache/thrift v0.13.0
+	github.com/apache/thrift v0.14.1
 	github.com/cenkalti/backoff/v4 v4.1.0
 	github.com/census-instrumentation/opencensus-proto v0.3.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
@@ -35,7 +35,6 @@ require (
 	github.com/soheilhy/cmux v0.1.5
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.1.3
-	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tklauser/go-sysconf v0.3.4 // indirect
