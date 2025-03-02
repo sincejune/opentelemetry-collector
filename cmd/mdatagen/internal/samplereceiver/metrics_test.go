@@ -5,6 +5,7 @@ package samplereceiver
 
 import (
 	"context"
+	"go.opentelemetry.io/otel/attribute"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -52,4 +53,29 @@ func TestComponentTelemetry(t *testing.T) {
 			},
 		}, metricdatatest.IgnoreTimestamp())
 	require.NoError(t, tt.Shutdown(context.Background()))
+
+
+
+    metricsConfig :=  metadata.DefaultMetricsConfig()
+	got, err := tt.GetMetric(metricsConfig.DefaultMetric.Name)
+	require.NoError(t, err)
+	metricdatatest.AssertEqual(t,
+		metricdata.Metrics{
+			Name:        "otelcol_receiver_accepted_spans",
+			Description: "Number of spans successfully pushed into the pipeline. [alpha]",
+			Unit:        "{spans}",
+			Data: metricdata.Sum[int64]{
+				Temporality: metricdata.CumulativeTemporality,
+				IsMonotonic: true,
+				DataPoints: []metricdata.DataPoint[int64]{
+					{
+						Attributes: attribute.NewSet(
+							attribute.String("receiver", .receiverID.String()),
+							attribute.String("transport", "grpc")),
+						Value: int64(2),
+					},
+				},
+			},
+		}, got, metricdatatest.IgnoreTimestamp(), metricdatatest.IgnoreExemplars())
+
 }
