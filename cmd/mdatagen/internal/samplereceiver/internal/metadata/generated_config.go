@@ -55,6 +55,14 @@ func DefaultMetricsConfig() MetricsConfig {
 	}
 }
 
+// LogsConfig provides config for sample logs.
+type LogsConfig struct {
+}
+
+func DefaultLogsConfig() LogsConfig {
+	return LogsConfig{}
+}
+
 // ResourceAttributeConfig provides common config for a particular resource attribute.
 type ResourceAttributeConfig struct {
 	Enabled bool `mapstructure:"enabled"`
@@ -131,6 +139,19 @@ type MetricsBuilderConfig struct {
 func DefaultMetricsBuilderConfig() MetricsBuilderConfig {
 	return MetricsBuilderConfig{
 		Metrics:            DefaultMetricsConfig(),
+		ResourceAttributes: DefaultResourceAttributesConfig(),
+	}
+}
+
+// LogsBuilderConfig is a configuration for sample logs builder.
+type LogsBuilderConfig struct {
+	Logs               LogsConfig               `mapstructure:"logs"`
+	ResourceAttributes ResourceAttributesConfig `mapstructure:"resource_attributes"`
+}
+
+func DefaultLogsBuilderConfig() LogsBuilderConfig {
+	return LogsBuilderConfig{
+		Logs:               DefaultLogsConfig(),
 		ResourceAttributes: DefaultResourceAttributesConfig(),
 	}
 }

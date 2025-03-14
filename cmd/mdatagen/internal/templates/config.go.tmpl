@@ -47,6 +47,17 @@ func DefaultMetricsConfig() MetricsConfig {
 }
 {{- end }}
 
+{{ if .Logs }}
+// LogsConfig provides config for {{ .Type }} logs.
+type LogsConfig struct {
+}
+
+func DefaultLogsConfig() LogsConfig {
+	return LogsConfig{
+	}
+}
+{{- end }}
+
 {{ if .ResourceAttributes -}}
 // ResourceAttributeConfig provides common config for a particular resource attribute.
 type ResourceAttributeConfig struct {
@@ -106,6 +117,25 @@ type MetricsBuilderConfig struct {
 func DefaultMetricsBuilderConfig() MetricsBuilderConfig {
 	return MetricsBuilderConfig {
 		Metrics: DefaultMetricsConfig(),
+		{{- if .ResourceAttributes }}
+		ResourceAttributes: DefaultResourceAttributesConfig(),
+		{{- end }}
+	}
+}
+{{- end }}
+
+{{ if .Logs }}
+// LogsBuilderConfig is a configuration for {{ .Type }} logs builder.
+type LogsBuilderConfig struct {
+	Logs LogsConfig `mapstructure:"logs"`
+	{{- if .ResourceAttributes }}
+	ResourceAttributes ResourceAttributesConfig `mapstructure:"resource_attributes"`
+	{{- end }}
+}
+
+func DefaultLogsBuilderConfig() LogsBuilderConfig {
+	return LogsBuilderConfig {
+		Logs: DefaultLogsConfig(),
 		{{- if .ResourceAttributes }}
 		ResourceAttributes: DefaultResourceAttributesConfig(),
 		{{- end }}
