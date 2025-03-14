@@ -13,6 +13,7 @@ import (
 // LogsBuilder provides an interface for scrapers to report logs while taking care of all the transformations
 // required to produce log representation defined in metadata and user config.
 type LogsBuilder struct {
+	config     LogsBuilderConfig // config of the metrics builder.
 	logsBuffer plog.Logs
 	buildInfo  component.BuildInfo // contains version information.
 }
@@ -27,8 +28,9 @@ type logBuilderOptionFunc func(mb *LogsBuilder)
 func (mbof logBuilderOptionFunc) apply(mb *LogsBuilder) {
 	mbof(mb)
 }
-func NewLogsBuilder(settings receiver.Settings, options ...LogBuilderOption) *LogsBuilder {
+func NewLogsBuilder(lbc LogsBuilderConfig, settings receiver.Settings, options ...LogBuilderOption) *LogsBuilder {
 	mb := &LogsBuilder{
+		config:     lbc,
 		logsBuffer: plog.NewLogs(),
 		buildInfo:  settings.BuildInfo,
 	}
