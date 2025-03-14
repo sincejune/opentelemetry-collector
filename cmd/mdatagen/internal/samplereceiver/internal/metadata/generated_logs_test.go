@@ -9,7 +9,6 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest/observer"
 
-	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
@@ -46,12 +45,10 @@ func TestLogsBuilder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			start := pcommon.Timestamp(1_000_000_000)
-			ts := pcommon.Timestamp(1_000_001_000)
 			observedZapCore, observedLogs := observer.New(zap.WarnLevel)
 			settings := receivertest.NewNopSettings(receivertest.NopType)
 			settings.Logger = zap.New(observedZapCore)
-			mb := NewLogsBuilder(settings, WithStartTime(start))
+			mb := NewLogsBuilder(loadLogsBuilderConfig(t, tt.name), settings)
 
 			expectedWarnings := 0
 			if tt.resAttrsSet == testDataSetDefault {
@@ -100,13 +97,7 @@ func TestLogsBuilder(t *testing.T) {
 			if tt.logsSet == testDataSetAll {
 				assert.Equal(t, allLogsCount, ms.Len())
 			}
-			validatedLogs := make(map[string]bool)
 			for i := 0; i < ms.Len(); i++ {
-				switch ms.At(i).Body() {
-				case "log1":
-					assert.False(t, validatedLogs["log1"], "Found a duplicate in the logs slice: log1")
-					validatedLogs["log1"] = true
-				}
 			}
 		})
 	}
