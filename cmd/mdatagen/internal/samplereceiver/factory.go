@@ -78,7 +78,7 @@ type noplogsReceiver struct {
 	telemetryBuilder *metadata.TelemetryBuilder
 }
 
-func (r noplogsReceiver) Shutdown(ctx context.Context) error {
+func (r noplogsReceiver) Shutdown(context.Context) error {
 	if r.telemetryBuilder != nil {
 		r.telemetryBuilder.Shutdown()
 	}
