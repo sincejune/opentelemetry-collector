@@ -45,11 +45,42 @@ func createMetrics(ctx context.Context, set receiver.Settings, _ component.Confi
 	return nopReceiver{telemetryBuilder: telemetryBuilder}, nil
 }
 
-func createLogs(context.Context, receiver.Settings, component.Config, consumer.Logs) (receiver.Logs, error) {
-	return nopInstance, nil
+type Config1 struct {
+	metadata.MetricsBuilderConfig `mapstructure:",squash"`
+	metadata.LogsBuilderConfig    `mapstructure:",squash"`
 }
 
-var nopInstance = &nopReceiver{}
+func createLogs(ctx context.Context, set receiver.Settings, conf component.Config, consumer consumer.Logs) (receiver.Logs, error) {
+	_, err := metadata.NewTelemetryBuilder(set.TelemetrySettings)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg, ok := conf.(*Config1)
+
+	if !ok {
+		return nopLogsInstance, nil
+	}
+
+	lb := metadata.NewLogsBuilder(cfg.LogsBuilderConfig, set)
+	rb := lb.NewResourceBuilder()
+	rb.SetStringResourceAttr("attr")
+	lb.EmitForResource(metadata.WithLogsResource(rb.Emit()))
+
+	_ = consumer.ConsumeLogs(ctx, lb.Emit())
+	// err = telemetryBuilder.
+	return nopLogsInstance, nil
+}
+
+var (
+	nopInstance     = &nopReceiver{}
+	nopLogsInstance = &noplogsReceiver{}
+)
+
+type noplogsReceiver struct {
+	component.StartFunc
+	component.ShutdownFunc
+}
 
 type nopReceiver struct {
 	component.StartFunc

@@ -33,6 +33,8 @@ type Metadata struct {
 	Attributes map[AttributeName]Attribute `mapstructure:"attributes"`
 	// Metrics that can be emitted by the component.
 	Metrics map[MetricName]Metric `mapstructure:"metrics"`
+	// Logs that can be emitted by the component.
+	Logs map[LogName]string `mapstructure:"logs"`
 	// GithubProject is the project where the component README lives in the format of org/repo, defaults to open-telemetry/opentelemetry-collector-contrib
 	GithubProject string `mapstructure:"github_project"`
 	// ScopeName of the metrics emitted by the component.
