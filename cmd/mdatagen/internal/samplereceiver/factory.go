@@ -75,14 +75,7 @@ var (
 
 type noplogsReceiver struct {
 	component.StartFunc
-	telemetryBuilder *metadata.TelemetryBuilder
-}
-
-func (r noplogsReceiver) Shutdown(context.Context) error {
-	if r.telemetryBuilder != nil {
-		r.telemetryBuilder.Shutdown()
-	}
-	return nil
+	component.ShutdownFunc
 }
 
 type nopReceiver struct {
