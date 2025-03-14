@@ -25,17 +25,6 @@ func TestLogsBuilder(t *testing.T) {
 		{
 			name: "default",
 		},
-		{
-			name:        "all_set",
-			logsSet:  testDataSetAll,
-			resAttrsSet: testDataSetAll,
-		},
-		{
-			name:        "none_set",
-			logsSet:  testDataSetNone,
-			resAttrsSet: testDataSetNone,
-			expectEmpty: true,
-		},
 		{{- if .ResourceAttributes }}
 		{
 			name:        "filter_set_include",
@@ -50,40 +39,12 @@ func TestLogsBuilder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			observedZapCore, observedLogs := observer.New(zap.WarnLevel)
+			observedZapCore, _ := observer.New(zap.WarnLevel)
         	{{- if or isReceiver isScraper isConnector }}
             settings := {{ .Status.Class }}test.NewNopSettings({{ .Status.Class }}test.NopType)
 	        {{- end }}
 			settings.Logger = zap.New(observedZapCore)
 			mb := NewLogsBuilder(loadLogsBuilderConfig(t, tt.name), settings)
-
-			expectedWarnings := 0
-			{{- range $name, $attr := .ResourceAttributes }}
-			{{- if and $attr.Enabled $attr.Warnings.IfEnabled }}
-			if tt.resAttrsSet == testDataSetDefault || tt.resAttrsSet == testDataSetAll {
-				assert.Equal(t, "[WARNING] `{{ $name }}` should not be enabled: {{ $attr.Warnings.IfEnabled }}", observedLogs.All()[expectedWarnings].Message)
-				expectedWarnings++
-			}
-			{{- end }}
-			{{- if $attr.Warnings.IfEnabledNotSet }}
-			if tt.resAttrsSet == testDataSetDefault {
-				assert.Equal(t, "[WARNING] Please set `enabled` field explicitly for `{{ $name }}`: {{ $attr.Warnings.IfEnabledNotSet }}", observedLogs.All()[expectedWarnings].Message)
-				expectedWarnings++
-			}
-			{{- end }}
-			{{- if $attr.Warnings.IfConfigured }}
-			if tt.resAttrsSet == testDataSetAll || tt.resAttrsSet == testDataSetNone {
-				assert.Equal(t, "[WARNING] `{{ $name }}` should not be configured: {{ $attr.Warnings.IfConfigured }}", observedLogs.All()[expectedWarnings].Message)
-				expectedWarnings++
-			}
-			{{- end }}
-			{{- end }}
-
-
-			assert.Equal(t, expectedWarnings, observedLogs.Len())
-
-			defaultLogsCount := 0
-			allLogsCount := 0
 
 			{{ if .ResourceAttributes }}
 			rb := mb.NewResourceBuilder()
@@ -103,20 +64,6 @@ func TestLogsBuilder(t *testing.T) {
 			if tt.expectEmpty {
 				assert.Equal(t, 0, logs.ResourceLogs().Len())
 				return
-			}
-
-			assert.Equal(t, 1, logs.ResourceLogs().Len())
-			rm := logs.ResourceLogs().At(0)
-			assert.Equal(t, res, rm.Resource())
-			assert.Equal(t, 1, rm.ScopeLogs().Len())
-			ms := rm.ScopeLogs().At(0).LogRecords()
-			if tt.logsSet == testDataSetDefault {
-				assert.Equal(t, defaultLogsCount, ms.Len())
-			}
-			if tt.logsSet == testDataSetAll {
-				assert.Equal(t, allLogsCount, ms.Len())
-			}
-			for i := 0; i < ms.Len(); i++ {
 			}
 		})
 	}

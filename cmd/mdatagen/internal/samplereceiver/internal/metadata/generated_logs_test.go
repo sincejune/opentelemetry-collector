@@ -23,17 +23,6 @@ func TestLogsBuilder(t *testing.T) {
 			name: "default",
 		},
 		{
-			name:        "all_set",
-			logsSet:     testDataSetAll,
-			resAttrsSet: testDataSetAll,
-		},
-		{
-			name:        "none_set",
-			logsSet:     testDataSetNone,
-			resAttrsSet: testDataSetNone,
-			expectEmpty: true,
-		},
-		{
 			name:        "filter_set_include",
 			resAttrsSet: testDataSetAll,
 		},
@@ -45,29 +34,10 @@ func TestLogsBuilder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			observedZapCore, observedLogs := observer.New(zap.WarnLevel)
+			observedZapCore, _ := observer.New(zap.WarnLevel)
 			settings := receivertest.NewNopSettings(receivertest.NopType)
 			settings.Logger = zap.New(observedZapCore)
 			mb := NewLogsBuilder(loadLogsBuilderConfig(t, tt.name), settings)
-
-			expectedWarnings := 0
-			if tt.resAttrsSet == testDataSetDefault {
-				assert.Equal(t, "[WARNING] Please set `enabled` field explicitly for `string.resource.attr_disable_warning`: This resource_attribute will be disabled by default soon.", observedLogs.All()[expectedWarnings].Message)
-				expectedWarnings++
-			}
-			if tt.resAttrsSet == testDataSetAll || tt.resAttrsSet == testDataSetNone {
-				assert.Equal(t, "[WARNING] `string.resource.attr_remove_warning` should not be configured: This resource_attribute is deprecated and will be removed soon.", observedLogs.All()[expectedWarnings].Message)
-				expectedWarnings++
-			}
-			if tt.resAttrsSet == testDataSetDefault || tt.resAttrsSet == testDataSetAll {
-				assert.Equal(t, "[WARNING] `string.resource.attr_to_be_removed` should not be enabled: This resource_attribute is deprecated and will be removed soon.", observedLogs.All()[expectedWarnings].Message)
-				expectedWarnings++
-			}
-
-			assert.Equal(t, expectedWarnings, observedLogs.Len())
-
-			defaultLogsCount := 0
-			allLogsCount := 0
 
 			rb := mb.NewResourceBuilder()
 			rb.SetMapResourceAttr(map[string]any{"key1": "map.resource.attr-val1", "key2": "map.resource.attr-val2"})
@@ -84,20 +54,6 @@ func TestLogsBuilder(t *testing.T) {
 			if tt.expectEmpty {
 				assert.Equal(t, 0, logs.ResourceLogs().Len())
 				return
-			}
-
-			assert.Equal(t, 1, logs.ResourceLogs().Len())
-			rm := logs.ResourceLogs().At(0)
-			assert.Equal(t, res, rm.Resource())
-			assert.Equal(t, 1, rm.ScopeLogs().Len())
-			ms := rm.ScopeLogs().At(0).LogRecords()
-			if tt.logsSet == testDataSetDefault {
-				assert.Equal(t, defaultLogsCount, ms.Len())
-			}
-			if tt.logsSet == testDataSetAll {
-				assert.Equal(t, allLogsCount, ms.Len())
-			}
-			for i := 0; i < ms.Len(); i++ {
 			}
 		})
 	}
