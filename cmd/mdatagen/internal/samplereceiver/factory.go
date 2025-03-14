@@ -56,7 +56,11 @@ func createLogs(ctx context.Context, set receiver.Settings, conf component.Confi
 		return nil, err
 	}
 
-	cfg, _ := conf.(*Config1)
+	cfg, ok := conf.(*Config1)
+
+	if !ok {
+		return nopLogsInstance, nil
+	}
 
 	lb := metadata.NewLogsBuilder(cfg.LogsBuilderConfig, set)
 	rb := lb.NewResourceBuilder()
