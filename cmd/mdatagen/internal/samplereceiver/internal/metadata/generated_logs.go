@@ -34,6 +34,11 @@ func NewLogsBuilder(lbc LogsBuilderConfig, settings receiver.Settings, options .
 		logsBuffer: plog.NewLogs(),
 		buildInfo:  settings.BuildInfo,
 	}
+
+	for _, op := range options {
+		op.apply(mb)
+	}
+
 	return mb
 }
 

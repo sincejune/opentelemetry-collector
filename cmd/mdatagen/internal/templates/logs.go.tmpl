@@ -49,6 +49,11 @@ func NewLogsBuilder(lbc LogsBuilderConfig, settings {{ .Status.Class }}.Settings
 		logsBuffer: plog.NewLogs(),
 		buildInfo:     settings.BuildInfo,
 	}
+
+    for _, op := range options {
+        op.apply(mb)
+    }
+
 	return mb
 }
 {{- end }}
