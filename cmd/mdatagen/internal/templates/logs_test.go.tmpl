@@ -55,3 +55,52 @@ func TestLogsBuilder(t *testing.T) {
 		})
 	}
 }
+
+func TestLogsBuilderAppendLogRecord(t *testing.T) {
+	tests := []struct {
+		name        string
+		expectEmpty bool
+	}{
+		{
+			name: "default",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+            observedZapCore, _ := observer.New(zap.WarnLevel)
+        	{{- if or isReceiver isScraper }}
+            settings := {{ .Status.Class }}test.NewNopSettings({{ .Status.Class }}test.NopType)
+	        {{- end }}
+			settings.Logger = zap.New(observedZapCore)
+			lb := NewLogsBuilder(settings)
+
+			{{ if .ResourceAttributes }}
+			rb := lb.NewResourceBuilder()
+			{{- range $name, $attr := .ResourceAttributes }}
+			{{- if $attr.Enum }}
+			rb.Set{{ $attr.Name.Render }}{{ index $attr.Enum 0 | publicVar }}()
+			{{- else }}
+			rb.Set{{ $attr.Name.Render }}({{ $attr.TestValue }})
+			{{- end }}
+			{{- end }}
+			res := rb.Emit()
+			{{- else }}
+			res := pcommon.NewResource()
+			{{- end }}
+
+			lr := plog.NewLogRecord()
+			lr.SetTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+			lr.Attributes().PutStr("a", "b")
+
+			lb.AppendLog(lr)
+			logs := lb.Emit(WithLogsResource(res))
+
+
+
+			if tt.expectEmpty {
+				assert.Equal(t, 1, logs.ResourceLogs().Len())
+				return
+			}
+		})
+	}
+}

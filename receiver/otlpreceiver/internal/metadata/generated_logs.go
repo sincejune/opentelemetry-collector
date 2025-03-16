@@ -70,7 +70,7 @@ func (lb *LogsBuilder) AppendLog(log plog.LogRecord) {
 // just `Emit` function can be called instead.
 // Resource attributes should be provided as ResourceLogsOption arguments.
 func (lb *LogsBuilder) EmitForResource(options ...ResourceLogsOption) {
-	rl := plog.NewResourceLogs()
+	rl := lb.logsBuffer.ResourceLogs().AppendEmpty()
 	ils := rl.ScopeLogs().AppendEmpty()
 	ils.Scope().SetName(ScopeName)
 	ils.Scope().SetVersion(lb.buildInfo.Version)

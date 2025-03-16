@@ -4,11 +4,14 @@ package metadata
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest/observer"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
@@ -42,6 +45,48 @@ func TestLogsBuilder(t *testing.T) {
 
 			if tt.expectEmpty {
 				assert.Equal(t, 0, logs.ResourceLogs().Len())
+				return
+			}
+		})
+	}
+}
+
+func TestLogsBuilderAppendLogRecord(t *testing.T) {
+	tests := []struct {
+		name        string
+		expectEmpty bool
+	}{
+		{
+			name: "default",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			observedZapCore, _ := observer.New(zap.WarnLevel)
+			settings := receivertest.NewNopSettings(receivertest.NopType)
+			settings.Logger = zap.New(observedZapCore)
+			lb := NewLogsBuilder(settings)
+
+			rb := lb.NewResourceBuilder()
+			rb.SetMapResourceAttr(map[string]any{"key1": "map.resource.attr-val1", "key2": "map.resource.attr-val2"})
+			rb.SetOptionalResourceAttr("optional.resource.attr-val")
+			rb.SetSliceResourceAttr([]any{"slice.resource.attr-item1", "slice.resource.attr-item2"})
+			rb.SetStringEnumResourceAttrOne()
+			rb.SetStringResourceAttr("string.resource.attr-val")
+			rb.SetStringResourceAttrDisableWarning("string.resource.attr_disable_warning-val")
+			rb.SetStringResourceAttrRemoveWarning("string.resource.attr_remove_warning-val")
+			rb.SetStringResourceAttrToBeRemoved("string.resource.attr_to_be_removed-val")
+			res := rb.Emit()
+
+			lr := plog.NewLogRecord()
+			lr.SetTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+			lr.Attributes().PutStr("a", "b")
+
+			lb.AppendLog(lr)
+			logs := lb.Emit(WithLogsResource(res))
+
+			if tt.expectEmpty {
+				assert.Equal(t, 1, logs.ResourceLogs().Len())
 				return
 			}
 		})

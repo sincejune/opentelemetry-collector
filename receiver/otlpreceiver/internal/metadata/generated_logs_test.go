@@ -4,12 +4,14 @@ package metadata
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest/observer"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
+	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
@@ -34,6 +36,39 @@ func TestLogsBuilder(t *testing.T) {
 
 			if tt.expectEmpty {
 				assert.Equal(t, 0, logs.ResourceLogs().Len())
+				return
+			}
+		})
+	}
+}
+
+func TestLogsBuilderAppendLogRecord(t *testing.T) {
+	tests := []struct {
+		name        string
+		expectEmpty bool
+	}{
+		{
+			name: "default",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			observedZapCore, _ := observer.New(zap.WarnLevel)
+			settings := receivertest.NewNopSettings(receivertest.NopType)
+			settings.Logger = zap.New(observedZapCore)
+			lb := NewLogsBuilder(settings)
+
+			res := pcommon.NewResource()
+
+			lr := plog.NewLogRecord()
+			lr.SetTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+			lr.Attributes().PutStr("a", "b")
+
+			lb.AppendLog(lr)
+			logs := lb.Emit(WithLogsResource(res))
+
+			if tt.expectEmpty {
+				assert.Equal(t, 1, logs.ResourceLogs().Len())
 				return
 			}
 		})
