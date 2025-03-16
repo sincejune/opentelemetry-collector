@@ -183,6 +183,11 @@ func run(ymlPath string) error {
 		toGenerate[filepath.Join(tmplDir, "metrics_test.go.tmpl")] = filepath.Join(codeDir, "generated_metrics_test.go")
 	}
 
+	if md.isLogsEnabled() && md.Status.Class == "receiver" {
+		toGenerate[filepath.Join(tmplDir, "logs.go.tmpl")] = filepath.Join(codeDir, "generated_logs.go")
+		toGenerate[filepath.Join(tmplDir, "logs_test.go.tmpl")] = filepath.Join(codeDir, "generated_logs_test.go")
+	}
+
 	// If at least one file to generate, will need the codeDir
 	if len(toGenerate) > 0 {
 		if err = os.MkdirAll(codeDir, 0o700); err != nil {
