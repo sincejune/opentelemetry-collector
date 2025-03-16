@@ -27,23 +27,13 @@ type LogBuilderOption interface {
     apply(*LogsBuilder)
 }
 
-type logBuilderOptionFunc func(lb *LogsBuilder)
-
-func (lbof logBuilderOptionFunc) apply(lb *LogsBuilder) {
-  lbof(lb)
-}
-
 {{- if isReceiver }}
-func NewLogsBuilder(settings {{ .Status.Class }}.Settings, options ...LogBuilderOption) *LogsBuilder {
+func NewLogsBuilder(settings {{ .Status.Class }}.Settings) *LogsBuilder {
 	lb := &LogsBuilder{
 		logsBuffer:     plog.NewLogs(),
 		logRecordsBuffer: plog.NewLogRecordSlice(),
 		buildInfo:      settings.BuildInfo,
 	}
-
-    for _, op := range options {
-        op.apply(lb)
-    }
 
 	return lb
 }
