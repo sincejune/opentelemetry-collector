@@ -183,7 +183,7 @@ func run(ymlPath string) error {
 		toGenerate[filepath.Join(tmplDir, "metrics_test.go.tmpl")] = filepath.Join(codeDir, "generated_metrics_test.go")
 	}
 
-	if md.isLogsEnabled() && md.Status.Class == "receiver" {
+	if md.supportsSignal("logs") && md.Status.Class == "receiver" {
 		toGenerate[filepath.Join(tmplDir, "logs.go.tmpl")] = filepath.Join(codeDir, "generated_logs.go")
 		toGenerate[filepath.Join(tmplDir, "logs_test.go.tmpl")] = filepath.Join(codeDir, "generated_logs_test.go")
 	}

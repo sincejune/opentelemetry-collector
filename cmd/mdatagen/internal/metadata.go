@@ -169,18 +169,6 @@ func validateMetrics(metrics map[MetricName]Metric, attributes map[AttributeName
 	return errs
 }
 
-func (md *Metadata) isLogsEnabled() bool {
-	for _, stability := range md.Status.Stability {
-		for _, signal := range stability {
-			if signal == "logs" {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 type AttributeName string
 
 func (mn AttributeName) Render() (string, error) {
