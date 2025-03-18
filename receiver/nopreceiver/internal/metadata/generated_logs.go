@@ -51,7 +51,7 @@ func WithLogsResource(res pcommon.Resource) ResourceLogsOption {
 	})
 }
 
-func (lb *LogsBuilder) AppendLog(log plog.LogRecord) {
+func (lb *LogsBuilder) AppendLogRecord(log plog.LogRecord) {
 	log.MoveTo(lb.logRecordsBuffer.AppendEmpty())
 }
 

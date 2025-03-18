@@ -15,62 +15,49 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
-func TestLogsBuilder(t *testing.T) {
-	tests := []struct {
-		name        string
-		expectEmpty bool
-	}{
-		{
-			name: "default",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			observedZapCore, _ := observer.New(zap.WarnLevel)
-			settings := receivertest.NewNopSettings(receivertest.NopType)
-			settings.Logger = zap.New(observedZapCore)
-			lb := NewLogsBuilder(settings)
-
-			res := pcommon.NewResource()
-			logs := lb.Emit(WithLogsResource(res))
-
-			if tt.expectEmpty {
-				assert.Equal(t, 0, logs.ResourceLogs().Len())
-				return
-			}
-		})
-	}
-}
-
 func TestLogsBuilderAppendLogRecord(t *testing.T) {
-	tests := []struct {
-		name        string
-		expectEmpty bool
-	}{
-		{
-			name: "default",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			observedZapCore, _ := observer.New(zap.WarnLevel)
-			settings := receivertest.NewNopSettings(receivertest.NopType)
-			settings.Logger = zap.New(observedZapCore)
-			lb := NewLogsBuilder(settings)
+	observedZapCore, _ := observer.New(zap.WarnLevel)
+	settings := receivertest.NewNopSettings(receivertest.NopType)
+	settings.Logger = zap.New(observedZapCore)
+	lb := NewLogsBuilder(settings)
 
-			res := pcommon.NewResource()
+	res := pcommon.NewResource()
 
-			lr := plog.NewLogRecord()
-			lr.SetTimestamp(pcommon.NewTimestampFromTime(time.Now()))
-			lr.Attributes().PutStr("a", "b")
+	// append the first log record
+	lr := plog.NewLogRecord()
+	lr.SetTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+	lr.Attributes().PutStr("type", "log")
+	lr.Body().SetStr("the first log record")
 
-			lb.AppendLog(lr)
-			logs := lb.Emit(WithLogsResource(res))
+	// append the second log record
+	lr2 := plog.NewLogRecord()
+	lr2.SetTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+	lr2.Attributes().PutStr("type", "event")
+	lr2.Body().SetStr("the second log record")
 
-			if tt.expectEmpty {
-				assert.Equal(t, 1, logs.ResourceLogs().Len())
-				return
-			}
-		})
-	}
+	lb.AppendLogRecord(lr)
+	lb.AppendLogRecord(lr2)
+
+	logs := lb.Emit(WithLogsResource(res))
+	assert.Equal(t, 1, logs.ResourceLogs().Len())
+
+	rl := logs.ResourceLogs().At(0)
+	assert.Equal(t, 1, rl.ScopeLogs().Len())
+
+	sl := rl.ScopeLogs().At(0)
+	assert.Equal(t, 2, sl.LogRecords().Len())
+
+	attrVal, ok := sl.LogRecords().At(0).Attributes().Get("type")
+	assert.True(t, ok)
+	assert.Equal(t, "log", attrVal.Str())
+
+	assert.Equal(t, pcommon.ValueTypeStr, sl.LogRecords().At(0).Body().Type())
+	assert.Equal(t, "the first log record", sl.LogRecords().At(0).Body().Str())
+
+	attrVal, ok = sl.LogRecords().At(1).Attributes().Get("type")
+	assert.True(t, ok)
+	assert.Equal(t, "event", attrVal.Str())
+
+	assert.Equal(t, pcommon.ValueTypeStr, sl.LogRecords().At(1).Body().Type())
+	assert.Equal(t, "the second log record", sl.LogRecords().At(1).Body().Str())
 }
