@@ -51,8 +51,9 @@ func WithLogsResource(res pcommon.Resource) ResourceLogsOption {
 	})
 }
 
-func (lb *LogsBuilder) AppendLogRecord(log plog.LogRecord) {
-	log.MoveTo(lb.logRecordsBuffer.AppendEmpty())
+// AppendLogRecord adds a log record to the logs builder.
+func (lb *LogsBuilder) AppendLogRecord(lr plog.LogRecord) {
+	lr.MoveTo(lb.logRecordsBuffer.AppendEmpty())
 }
 
 // EmitForResource saves all the generated logs under a new resource and updates the internal state to be ready for
