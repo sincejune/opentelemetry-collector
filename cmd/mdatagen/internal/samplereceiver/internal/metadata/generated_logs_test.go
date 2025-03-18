@@ -54,6 +54,9 @@ func TestLogsBuilderAppendLogRecord(t *testing.T) {
 	assert.Equal(t, 1, rl.ScopeLogs().Len())
 
 	sl := rl.ScopeLogs().At(0)
+	assert.Equal(t, ScopeName, sl.Scope().Name())
+	assert.Equal(t, lb.buildInfo.Version, sl.Scope().Version())
+
 	assert.Equal(t, 2, sl.LogRecords().Len())
 
 	attrVal, ok := sl.LogRecords().At(0).Attributes().Get("type")
