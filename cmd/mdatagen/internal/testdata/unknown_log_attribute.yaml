@@ -1,4 +1,4 @@
-type: logreceiver
+type: receiver
 
 status:
   class: receiver
