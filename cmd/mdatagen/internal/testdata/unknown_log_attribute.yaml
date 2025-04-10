@@ -1,4 +1,4 @@
-type: metricreceiver
+type: logreceiver
 
 status:
   class: receiver

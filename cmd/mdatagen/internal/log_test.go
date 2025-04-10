@@ -24,18 +24,18 @@ func TestLogNameRender(t *testing.T) {
 	} {
 		exported, err := tt.name.Render()
 		if tt.success {
-			require.Nil(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tt.expectedExported, exported)
 		} else {
-			require.NotNil(t, err)
+			require.Error(t, err)
 		}
 
 		unexported, err := tt.name.RenderUnexported()
 		if tt.success {
-			require.Nil(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tt.expectedUnExported, unexported)
 		} else {
-			require.NotNil(t, err)
+			require.Error(t, err)
 		}
 	}
 }
