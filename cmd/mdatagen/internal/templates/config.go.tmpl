@@ -98,7 +98,7 @@ type ResourceAttributeConfig struct {
 	// MetricsInclude has higher priority than MetricsExclude.
 	MetricsExclude []filter.Config `mapstructure:"metrics_exclude"`
 	{{- end }}
-    {{- if .Events }}
+	{{- if .Events }}
 	// Note: This only works when `events` are specified in metadata.yml
 	// Experimental: EventsInclude defines a list of filters for attribute values.
 	// If the list is not empty, only events with matching resource attribute values will be emitted.
