@@ -90,7 +90,7 @@
 | Name | Description | Values |
 | ---- | ----------- | ------ |
 {{- range $metric.Attributes }}
-{{- $attribute := . | attributeInfo }}
+{{- $attribute := $metric.AttributeInfo . }}
 | {{ $attribute.Name }} | {{ $attribute.Description }} |
 {{- if $attribute.Enum }} {{ $attribute.Type }}: ``{{ stringsJoin $attribute.Enum "``, ``" }}``{{ else }} Any {{ $attribute.Type }}{{ end }} |
 {{- end }}

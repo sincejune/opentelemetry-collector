@@ -20,7 +20,7 @@ import (
 )
 
 
-{{ if getEventOptionalAttributes .Attributes }}
+{{ if getEventOptionalAttributes }}
 type EventAttributeOption interface {
 	apply(plog.LogRecord)
 }
@@ -31,7 +31,7 @@ func (eaof eventAttributeOptionFunc) apply(lr plog.LogRecord) {
 	eaof(lr)
 }
 
-{{ range $name, $attr := getEventOptionalAttributes .Attributes }}
+{{ range $name, $attr := getEventOptionalAttributes }}
 func With{{ $name.Render }}EventAttribute({{ $name.RenderUnexported }}AttributeValue {{ $attr.Type.Primitive }}) EventAttributeOption {
 	return eventAttributeOptionFunc(func(dp plog.LogRecord) {
 		{{- template "putAttribute" (parseAttributePair $name $attr) }}

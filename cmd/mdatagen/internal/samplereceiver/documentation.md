@@ -90,6 +90,8 @@ metrics:
 | boolean_attr | Attribute with a boolean value. | Any Bool | false |
 | boolean_attr2 | Another attribute with a boolean value. | Any Bool | false |
 | optional_string_attr | An optional attribute with any string value | Any Str | true |
+| required_attr_to_be_optional | An required string attribute will be optional in metric/event level. | Any Str | false |
+| optional_attr_to_be_required | An optional string attribute will be required in metric/event level. | Any Str | true |
 
 ### optional.metric.empty_unit
 

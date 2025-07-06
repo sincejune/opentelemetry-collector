@@ -214,10 +214,7 @@ func templatize(tmplFile string, md Metadata) *template.Template {
 				"publicVar": func(s string) (string, error) {
 					return FormatIdentifier(s, true)
 				},
-				"attributeInfo": func(an AttributeName) Attribute {
-					return md.Attributes[an]
-				},
-				"getEventOptionalAttributes": func(attrs map[AttributeName]Attribute) map[AttributeName]Attribute {
+				"getEventOptionalAttributes": func() map[AttributeName]Attribute {
 					results := make(map[AttributeName]Attribute)
 
 					for _, event := range md.Events {
@@ -226,7 +223,7 @@ func templatize(tmplFile string, md Metadata) *template.Template {
 								continue
 							}
 
-							if attr, exists := attrs[name]; exists && attr.Optional {
+							if attr, exists := md.Attributes[name]; exists && attr.Optional {
 								results[name] = attr
 							}
 						}
@@ -236,7 +233,7 @@ func templatize(tmplFile string, md Metadata) *template.Template {
 								continue
 							}
 
-							if attr, exists := attrs[name]; exists && override.Optional {
+							if attr, exists := md.Attributes[name]; exists && override.Optional {
 								attr.Optional = true
 								results[name] = attr
 							}
@@ -244,7 +241,7 @@ func templatize(tmplFile string, md Metadata) *template.Template {
 					}
 					return results
 				},
-				"getMetricOptionalAttributes": func(attrs map[AttributeName]Attribute) map[AttributeName]Attribute {
+				"getMetricOptionalAttributes": func() map[AttributeName]Attribute {
 					results := make(map[AttributeName]Attribute)
 
 					for _, metric := range md.Metrics {
@@ -253,7 +250,7 @@ func templatize(tmplFile string, md Metadata) *template.Template {
 								continue
 							}
 
-							if attr, exists := attrs[name]; exists && attr.Optional {
+							if attr, exists := md.Attributes[name]; exists && attr.Optional {
 								results[name] = attr
 							}
 						}
@@ -263,7 +260,7 @@ func templatize(tmplFile string, md Metadata) *template.Template {
 								continue
 							}
 
-							if attr, exists := attrs[name]; exists && override.Optional {
+							if attr, exists := md.Attributes[name]; exists && override.Optional {
 								attr.Optional = true
 								results[name] = attr
 							}

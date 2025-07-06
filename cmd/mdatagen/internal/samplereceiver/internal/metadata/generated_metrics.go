@@ -294,7 +294,7 @@ func (m *metricOptionalMetric) init() {
 	m.data.Gauge().DataPoints().EnsureCapacity(m.capacity)
 }
 
-func (m *metricOptionalMetric) recordDataPoint(start pcommon.Timestamp, ts pcommon.Timestamp, val float64, stringAttrAttributeValue string, booleanAttrAttributeValue bool, booleanAttr2AttributeValue bool, options ...MetricAttributeOption) {
+func (m *metricOptionalMetric) recordDataPoint(start pcommon.Timestamp, ts pcommon.Timestamp, val float64, stringAttrAttributeValue string, booleanAttrAttributeValue bool, booleanAttr2AttributeValue bool, requiredAttrToBeOptionalAttributeValue string, options ...MetricAttributeOption) {
 	if !m.config.Enabled {
 		return
 	}
@@ -305,6 +305,7 @@ func (m *metricOptionalMetric) recordDataPoint(start pcommon.Timestamp, ts pcomm
 	dp.Attributes().PutStr("string_attr", stringAttrAttributeValue)
 	dp.Attributes().PutBool("boolean_attr", booleanAttrAttributeValue)
 	dp.Attributes().PutBool("boolean_attr2", booleanAttr2AttributeValue)
+	dp.Attributes().PutStr("required_attr_to_be_optional", requiredAttrToBeOptionalAttributeValue)
 	for _, op := range options {
 		op.apply(dp)
 	}
@@ -631,8 +632,8 @@ func (mb *MetricsBuilder) RecordMetricInputTypeDataPoint(ts pcommon.Timestamp, i
 }
 
 // RecordOptionalMetricDataPoint adds a data point to optional.metric metric.
-func (mb *MetricsBuilder) RecordOptionalMetricDataPoint(ts pcommon.Timestamp, val float64, stringAttrAttributeValue string, booleanAttrAttributeValue bool, booleanAttr2AttributeValue bool, options ...MetricAttributeOption) {
-	mb.metricOptionalMetric.recordDataPoint(mb.startTime, ts, val, stringAttrAttributeValue, booleanAttrAttributeValue, booleanAttr2AttributeValue, options...)
+func (mb *MetricsBuilder) RecordOptionalMetricDataPoint(ts pcommon.Timestamp, val float64, stringAttrAttributeValue string, booleanAttrAttributeValue bool, booleanAttr2AttributeValue bool, requiredAttrToBeOptionalAttributeValue string, options ...MetricAttributeOption) {
+	mb.metricOptionalMetric.recordDataPoint(mb.startTime, ts, val, stringAttrAttributeValue, booleanAttrAttributeValue, booleanAttr2AttributeValue, requiredAttrToBeOptionalAttributeValue, options...)
 }
 
 // RecordOptionalMetricEmptyUnitDataPoint adds a data point to optional.metric.empty_unit metric.

@@ -108,6 +108,9 @@ func TestValidate(t *testing.T) {
 			wantErr: "event \"system.event\" refers to undefined attributes: [missing]",
 		},
 		{
+			name:
+		},
+		{
 			name:    "testdata/unused_attribute.yaml",
 			wantErr: "unused attributes: [unused_attr]",
 		},

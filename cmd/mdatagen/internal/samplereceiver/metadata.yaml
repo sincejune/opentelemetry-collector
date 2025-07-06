@@ -175,7 +175,7 @@ metrics:
     unit: "1"
     gauge:
       value_type: double
-    attributes: [string_attr, boolean_attr, boolean_attr2, optional_string_attr]
+    attributes: [string_attr, boolean_attr, boolean_attr2, optional_string_attr, required_attr_to_be_optional, optional_attr_to_be_required]
     warnings:
       if_configured: This metric is deprecated and will be removed soon.
 
