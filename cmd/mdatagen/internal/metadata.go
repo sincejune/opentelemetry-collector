@@ -383,11 +383,6 @@ func (a Attribute) TestValue() string {
 	return ""
 }
 
-type AttributedSignal interface {
-	GetAttributes() []AttributeName
-	GetAttributeOverrides() map[AttributeName]AttributeOverride
-}
-
 type Signal struct {
 	Metadata *Metadata `mapstructure:"-"`
 
@@ -411,16 +406,6 @@ type Signal struct {
 
 	// AttributeOverride at the signal level.
 	AttributeOverrides map[AttributeName]AttributeOverride `mapstructure:"xattributes"`
-}
-
-func (s Signal) GetAttributes() []AttributeName {
-	// TODO implement me
-	return s.Attributes
-}
-
-func (s Signal) GetAttributeOverrides() map[AttributeName]AttributeOverride {
-	// TODO implement me
-	panic("implement me")
 }
 
 func (s Signal) HasOptionalAttribute(attrs map[AttributeName]Attribute) bool {

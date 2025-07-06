@@ -1,0 +1,55 @@
+type: receiver
+
+status:
+  class: receiver
+  stability:
+    development: [logs]
+    beta: [traces]
+    stable: [metrics]
+
+attributes:
+  optional_int_attr:
+    description: Optional int attr.
+    type: string
+    optional: true
+
+  required_int_attr:
+    description: Required int attr.
+    type: string
+    optional: false
+
+metrics:
+  default_metric:
+    enabled: true
+    description: Metric.
+    unit: "1"
+    gauge:
+      value_type: double
+    attributes: [optional_int_attr, required_int_attr]
+  default_metric_with_override:
+    enabled: true
+    description: Metric.
+    unit: "1"
+    gauge:
+      value_type: double
+    attributes: [ optional_int_attr, required_int_attr ]
+    xattributes:
+      optional_int_attr:
+        optional: false
+      required_int_attr:
+        optional: true
+
+events:
+  default_event:
+    enabled: true
+    description: Event.
+    attributes: [optional_int_attr]
+  default_event_with_override:
+    enabled: true
+    description: Event.
+    attributes: [optional_int_attr, required_int_attr]
+    xattributes:
+      optional_int_attr:
+        optional: false
+      required_int_attr:
+        optional: true
