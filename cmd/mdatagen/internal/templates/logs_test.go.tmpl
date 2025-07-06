@@ -196,13 +196,13 @@ func TestLogsBuilder(t *testing.T) {
 				allEventsCount++
 				lb.Record{{ $name.Render }}Event(ctx, timestamp
 				{{- range $event.Attributes -}}
-				{{- if not (attributeInfo .).Optional -}}
-					, {{- template "getAttributeValue" . -}}
+				{{- if not ($event.AttributeInfo .).Optional -}}
+					, {{- template "getAttributeValue" (parseAttributePair . ($event.AttributeInfo .)) -}}
 				{{- end -}}
 				{{- end -}}
 				{{- range $event.Attributes -}}
-                {{- if (attributeInfo .).Optional -}}
-                    , With{{ .Render }}EventAttribute({{- template "getAttributeValue" . -}})
+                {{- if ($event.AttributeInfo .).Optional -}}
+                    , With{{ .Render }}EventAttribute({{- template "getAttributeValue" (parseAttributePair . ($event.AttributeInfo .)) -}})
                 {{- end -}}
                 {{- end -}}
                 )
@@ -252,16 +252,16 @@ func TestLogsBuilder(t *testing.T) {
 					assert.Equal(t, pcommon.SpanID(spanID), lr.SpanID())
 
 					{{- range $i, $attr := $event.Attributes }}
-					attrVal, ok {{ if eq $i 0 }}:{{ end }}= lr.Attributes().Get("{{ (attributeInfo $attr).Name }}")
+					attrVal, ok {{ if eq $i 0 }}:{{ end }}= lr.Attributes().Get("{{ ($event.AttributeInfo $attr).Name }}")
 					assert.True(t, ok)
-					{{- if eq (attributeInfo $attr).Type.String "Bool"}}
-					assert.{{- if eq (attributeInfo $attr).TestValue "true" }}True{{ else }}False{{- end }}(t, attrVal.{{ (attributeInfo $attr).Type }}()
-					{{- else if eq (attributeInfo $attr).Type.String "Int"}}
-					assert.EqualValues(t, {{ (attributeInfo $attr).TestValue }}, attrVal.{{ (attributeInfo $attr).Type }}()
+					{{- if eq ($event.AttributeInfo $attr).Type.String "Bool"}}
+					assert.{{- if eq ($event.AttributeInfo $attr).TestValue "true" }}True{{ else }}False{{- end }}(t, attrVal.{{ ($event.AttributeInfo $attr).Type }}()
+					{{- else if eq ($event.AttributeInfo $attr).Type.String "Int"}}
+					assert.EqualValues(t, {{ ($event.AttributeInfo $attr).TestValue }}, attrVal.{{ ($event.AttributeInfo $attr).Type }}()
 					{{- else }}
-					assert.Equal(t, {{ (attributeInfo $attr).TestValue }}, attrVal.{{ (attributeInfo $attr).Type }}()
+					assert.Equal(t, {{ ($event.AttributeInfo $attr).TestValue }}, attrVal.{{ ($event.AttributeInfo $attr).Type }}()
 					{{- end }}
-					{{- if or (eq (attributeInfo $attr).Type.String "Slice") (eq (attributeInfo $attr).Type.String "Map")}}.AsRaw(){{ end }})
+					{{- if or (eq ($event.AttributeInfo $attr).Type.String "Slice") (eq ($event.AttributeInfo $attr).Type.String "Map")}}.AsRaw(){{ end }})
 					{{- end }}
 				{{- end }}
 				}

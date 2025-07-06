@@ -31,10 +31,10 @@ func (eaof eventAttributeOptionFunc) apply(lr plog.LogRecord) {
 	eaof(lr)
 }
 
-{{ range getEventOptionalAttributes .Attributes }}
-func With{{ .Render }}EventAttribute({{ .RenderUnexported }}AttributeValue {{ (attributeInfo .).Type.Primitive }}) EventAttributeOption {
+{{ range $name, $attr := getEventOptionalAttributes .Attributes }}
+func With{{ $name.Render }}EventAttribute({{ $name.RenderUnexported }}AttributeValue {{ $attr.Type.Primitive }}) EventAttributeOption {
 	return eventAttributeOptionFunc(func(dp plog.LogRecord) {
-		{{- template "putAttribute" . }}
+		{{- template "putAttribute" (parseAttributePair $name $attr) }}
 	})
 }
 {{ end }}
@@ -47,7 +47,7 @@ type event{{ $name.Render }} struct {
 }
 
 func (e *event{{ $name.Render }}) recordEvent(ctx context.Context, timestamp pcommon.Timestamp
-{{- range $event.Attributes -}}{{- if not (attributeInfo .).Optional -}}, {{ .RenderUnexported }}AttributeValue {{ (attributeInfo .).Type.Primitive }}{{ end }}{{end}}{{- if $event.HasOptionalAttribute $.Attributes -}}, options ...EventAttributeOption{{- end -}}) {
+{{- range $event.Attributes -}}{{- if not ($event.AttributeInfo .).Optional -}}, {{ .RenderUnexported }}AttributeValue {{ ($event.AttributeInfo .).Type.Primitive }}{{ end }}{{end}}{{- if $event.HasOptionalAttribute $.Attributes -}}, options ...EventAttributeOption{{- end -}}) {
 	if !e.config.Enabled {
 		return
 	}
@@ -61,8 +61,9 @@ func (e *event{{ $name.Render }}) recordEvent(ctx context.Context, timestamp pco
 	}
 
 	{{- range $event.Attributes }}
-	{{- if not (attributeInfo .).Optional -}}
-	{{- template "putAttribute" . }}
+	{{- $attr := $event.AttributeInfo . }}
+	{{- if not $attr.Optional -}}
+	{{- template "putAttribute" (parseAttributePair . $attr) }}
 	{{- end }}
 	{{- end }}
 
@@ -271,8 +272,8 @@ func (lb *LogsBuilder) Emit(options ...ResourceLogsOption) plog.Logs {
 // Record{{ $name.Render }}Event adds a log record of {{ $name }} event.
 func (lb *LogsBuilder) Record{{ $name.Render }}Event(ctx context.Context, timestamp pcommon.Timestamp
 	{{- range $event.Attributes -}}
-	{{- if not (attributeInfo .).Optional -}}
-	, {{ .RenderUnexported }}AttributeValue {{ if (attributeInfo .).Enum }}Attribute{{ .Render }}{{ else }}{{ (attributeInfo .).Type.Primitive }}{{ end }}
+	{{- if not ($event.AttributeInfo .).Optional -}}
+	, {{ .RenderUnexported }}AttributeValue {{ if ($event.AttributeInfo .).Enum }}Attribute{{ .Render }}{{ else }}{{ ($event.AttributeInfo .).Type.Primitive }}{{ end }}
 	{{- end -}}
 	{{- end -}}
 	{{- if $event.HasOptionalAttribute $.Attributes -}}
@@ -280,8 +281,8 @@ func (lb *LogsBuilder) Record{{ $name.Render }}Event(ctx context.Context, timest
 	{{- end -}}) {
 	lb.event{{ $name.Render }}.recordEvent(ctx, timestamp
 		{{- range $event.Attributes -}}
-		{{- if not (attributeInfo .).Optional -}}
-		, {{ .RenderUnexported }}AttributeValue{{ if (attributeInfo .).Enum }}.String(){{ end }}
+		{{- if not ($event.AttributeInfo .).Optional -}}
+		, {{ .RenderUnexported }}AttributeValue{{ if ($event.AttributeInfo .).Enum }}.String(){{ end }}
 		{{- end -}}
 		{{- end -}}
 		{{- if $event.HasOptionalAttribute $.Attributes -}}
