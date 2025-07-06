@@ -265,7 +265,7 @@ func TestLoadMetadata(t *testing.T) {
 							Warnings: Warnings{
 								IfConfigured: "This metric is deprecated and will be removed soon.",
 							},
-							Attributes: []AttributeName{"string_attr", "boolean_attr", "boolean_attr2", "optional_string_attr"},
+							Attributes: []AttributeName{"string_attr", "boolean_attr", "boolean_attr2", "optional_string_attr", "required_attr_to_be_optional", "optional_attr_to_be_required"},
 						},
 						Unit: strPtr("1"),
 						Gauge: &Gauge{
@@ -524,7 +524,7 @@ func TestLoadMetadata(t *testing.T) {
 				cmpOpts := cmp.Options{
 					cmpopts.IgnoreFields(Signal{}, "Metadata"),
 				}
-				require.True(t, cmp.Equal(tt.want, got, cmpOpts))
+				require.Empty(t, cmp.Diff(tt.want, got, cmpOpts))
 			}
 		})
 	}
