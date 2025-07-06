@@ -121,13 +121,14 @@ func TestMetricsBuilder(t *testing.T) {
 				allMetricsCount++
 				mb.Record{{ $name.Render }}DataPoint(ts, {{ if $metric.Data.HasMetricInputType }}"1"{{ else }}1{{ end }}
 				{{- range $metric.Attributes -}}
-				{{- if not (attributeInfo .).Optional -}}
-					, {{- template "getAttributeValue" . -}}
+				{{- $attr := $metric.AttributeInfo . }}
+				{{- if not $attr.Optional -}}
+					, {{- template "getAttributeValue" (parseAttributePair . ($metric.AttributeInfo .)) -}}
 				{{- end -}}
 				{{- end -}}
 				{{- range $metric.Attributes -}}
-                {{- if (attributeInfo .).Optional -}}
-                    , With{{ .Render }}MetricAttribute({{- template "getAttributeValue" . -}})
+                {{- if ($metric.AttributeInfo .).Optional -}}
+                    , With{{ .Render }}MetricAttribute({{- template "getAttributeValue" (parseAttributePair . ($metric.AttributeInfo .)) -}})
                 {{- end -}}
                 {{- end -}}
                 )
@@ -196,16 +197,16 @@ func TestMetricsBuilder(t *testing.T) {
 					{{- end }}
 
 					{{- range $i, $attr := $metric.Attributes }}
-					attrVal, ok {{ if eq $i 0 }}:{{ end }}= dp.Attributes().Get("{{ (attributeInfo $attr).Name }}")
+					attrVal, ok {{ if eq $i 0 }}:{{ end }}= dp.Attributes().Get("{{ ($metric.AttributeInfo $attr).Name }}")
 					assert.True(t, ok)
-					{{- if eq (attributeInfo $attr).Type.String "Bool"}}
-					assert.{{- if eq (attributeInfo $attr).TestValue "true" }}True{{ else }}False{{- end }}(t, attrVal.{{ (attributeInfo $attr).Type }}()
-					{{- else if eq (attributeInfo $attr).Type.String "Int"}}
-					assert.EqualValues(t, {{ (attributeInfo $attr).TestValue }}, attrVal.{{ (attributeInfo $attr).Type }}()
+					{{- if eq ($metric.AttributeInfo $attr).Type.String "Bool"}}
+					assert.{{- if eq ($metric.AttributeInfo $attr).TestValue "true" }}True{{ else }}False{{- end }}(t, attrVal.{{ ($metric.AttributeInfo $attr).Type }}()
+					{{- else if eq ($metric.AttributeInfo $attr).Type.String "Int"}}
+					assert.EqualValues(t, {{ ($metric.AttributeInfo $attr).TestValue }}, attrVal.{{ ($metric.AttributeInfo $attr).Type }}()
 					{{- else }}
-					assert.Equal(t, {{ (attributeInfo $attr).TestValue }}, attrVal.{{ (attributeInfo $attr).Type }}()
+					assert.Equal(t, {{ ($metric.AttributeInfo $attr).TestValue }}, attrVal.{{ ($metric.AttributeInfo $attr).Type }}()
 					{{- end }}
-					{{- if or (eq (attributeInfo $attr).Type.String "Slice") (eq (attributeInfo $attr).Type.String "Map")}}.AsRaw(){{ end }})
+					{{- if or (eq ($metric.AttributeInfo $attr).Type.String "Slice") (eq ($metric.AttributeInfo $attr).Type.String "Map")}}.AsRaw(){{ end }})
 					{{- end }}
 				{{- end }}
 				}
