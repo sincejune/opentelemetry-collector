@@ -119,7 +119,7 @@ func (m *metric{{ $name.Render }}) init() {
 }
 
 func (m *metric{{ $name.Render }}) recordDataPoint(start pcommon.Timestamp, ts pcommon.Timestamp, val {{ $metric.Data.MetricValueType.BasicType }}
-{{- range $metric.Attributes -}}{{- if not ($metric.AttributeInfo .).Optional -}}, {{ .RenderUnexported }}AttributeValue {{ ($metric.AttributeInfo .).Type.Primitive }}{{ end }}{{ end }}{{- if $metric.HasOptionalAttribute $.Attributes -}}, options ...MetricAttributeOption{{- end -}}) {
+{{- range $metric.Attributes -}}{{- if not ($metric.AttributeInfo .).Optional -}}, {{ .RenderUnexported }}AttributeValue {{ ($metric.AttributeInfo .).Type.Primitive }}{{ end }}{{ end }}{{- if $metric.HasOptionalAttribute -}}, options ...MetricAttributeOption{{- end -}}) {
 	if !m.config.Enabled {
 		return
 	}
@@ -134,7 +134,7 @@ func (m *metric{{ $name.Render }}) recordDataPoint(start pcommon.Timestamp, ts p
 	{{- end }}
 	{{- end }}
 
-	{{- if $metric.HasOptionalAttribute $.Attributes }}
+	{{- if $metric.HasOptionalAttribute }}
     for _, op := range options {
         op.apply(dp)
     }
@@ -382,7 +382,7 @@ func (mb *MetricsBuilder) Record{{ $name.Render }}DataPoint(ts pcommon.Timestamp
 	, {{ .RenderUnexported }}AttributeValue {{ if ($metric.AttributeInfo .).Enum }}Attribute{{ .Render }}{{ else }}{{ ($metric.AttributeInfo .).Type.Primitive }}{{ end }}
 	{{- end -}}
 	{{- end -}}
-	{{- if $metric.HasOptionalAttribute $.Attributes -}}
+	{{- if $metric.HasOptionalAttribute -}}
 	, options... MetricAttributeOption
 	{{- end -}}
 	)
@@ -403,7 +403,7 @@ func (mb *MetricsBuilder) Record{{ $name.Render }}DataPoint(ts pcommon.Timestamp
 		, {{ .RenderUnexported }}AttributeValue{{ if ($metric.AttributeInfo .).Enum }}.String(){{ end }}
 		{{- end -}}
 		{{- end -}}
-		{{- if $metric.HasOptionalAttribute $.Attributes -}}
+		{{- if $metric.HasOptionalAttribute -}}
         , options...
         {{- end -}}
         )

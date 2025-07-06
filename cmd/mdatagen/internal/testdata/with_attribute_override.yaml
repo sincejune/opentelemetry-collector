@@ -26,6 +26,26 @@ metrics:
     gauge:
       value_type: double
     attributes: [optional_int_attr, required_int_attr]
+  default_metric_with_optional_attr_enabled:
+    enabled: true
+    description: Metric.
+    unit: "1"
+    gauge:
+      value_type: double
+    attributes: [optional_int_attr]
+    xattributes:
+      optional_int_attr:
+        optional: true
+  default_metric_with_required_attr_enabled:
+    enabled: true
+    description: Metric.
+    unit: "1"
+    gauge:
+      value_type: double
+    attributes: [required_int_attr]
+    xattributes:
+      optional_int_attr:
+        optional: false
   default_metric_with_override:
     enabled: true
     description: Metric.
@@ -43,7 +63,21 @@ events:
   default_event:
     enabled: true
     description: Event.
+    attributes: [optional_int_attr, required_int_attr]
+  default_event_with_optional_attr_enabled:
+    enabled: true
+    description: Event.
     attributes: [optional_int_attr]
+    xattributes:
+      optional_int_attr:
+        optional: true
+  default_event_with_required_attr_enabled:
+    enabled: true
+    description: Event.
+    attributes: [required_int_attr]
+    xattributes:
+      optional_int_attr:
+        optional: false
   default_event_with_override:
     enabled: true
     description: Event.

@@ -408,15 +408,15 @@ type Signal struct {
 	AttributeOverrides map[AttributeName]AttributeOverride `mapstructure:"xattributes"`
 }
 
-func (s Signal) HasOptionalAttribute(attrs map[AttributeName]Attribute) bool {
+func (s Signal) HasOptionalAttribute() bool {
 	for _, attr := range s.Attributes {
-		if v, exists := attrs[attr]; exists && v.Optional {
+		if v, exists := s.Metadata.Attributes[attr]; exists && v.Optional {
 			return true
 		}
 	}
 
 	for key := range s.AttributeOverrides {
-		if v, exists := attrs[key]; exists && v.Optional {
+		if v, exists := s.Metadata.Attributes[key]; exists && v.Optional {
 			return true
 		}
 	}
