@@ -104,11 +104,16 @@ func TestValidate(t *testing.T) {
 			wantErr: "metric \"system.cpu.time\" refers to undefined attributes: [missing]",
 		},
 		{
+			name:    "testdata/unknown_metric_attribute_override.yaml",
+			wantErr: "metric \"system.cpu.time\" refers to undefined attributes: [missing]",
+		},
+		{
 			name:    "testdata/events/unknown_attribute.yaml",
 			wantErr: "event \"system.event\" refers to undefined attributes: [missing]",
 		},
 		{
-			name:
+			name:    "testdata/events/unknown_attribute_override.yaml",
+			wantErr: "event \"system.event\" refers to undefined attributes: [missing]",
 		},
 		{
 			name:    "testdata/unused_attribute.yaml",

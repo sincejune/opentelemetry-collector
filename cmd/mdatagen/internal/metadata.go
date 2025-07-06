@@ -451,12 +451,3 @@ func (s Signal) AttributeInfo(an AttributeName) Attribute {
 
 	return attr
 }
-
-func (s Signal) IsAttributeOptional(attr AttributeName, defaultVal bool) bool {
-	if v, exists := s.AttributeOverrides[attr]; exists {
-		fmt.Printf("Getting attribute override for %s: %v\n", attr, v.Optional)
-		return v.Optional
-	}
-
-	return defaultVal
-}
